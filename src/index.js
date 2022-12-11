@@ -1,6 +1,6 @@
+import "bootstrap/dist/css/bootstrap.css";
 import "react-app-polyfill/stable";
 import ReactDOM from "react-dom";
-import "bootstrap/dist/css/bootstrap.css";
 
 import App from "./App";
 import * as serviceWorker from "./serviceWorker";

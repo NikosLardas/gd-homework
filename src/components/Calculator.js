@@ -45,7 +45,7 @@ export const Calculator = () => {
 
                     <p className="kpi s-execute-kpi mt-4">{revenueSeries.dataPoints()[0].formattedValue()}</p>
 
-                    <select class="form-select" style={{ marginTop: "200px" }}>
+                    <select className="form-select" style={{ marginTop: "200px" }}>
                         <option selected value="Max Revenue">
                             Max Revenue Across Products
                         </option>
