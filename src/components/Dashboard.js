@@ -4,6 +4,7 @@ import { LineChart } from "@gooddata/sdk-ui-charts";
 import { DateFilter, DateFilterHelpers } from "@gooddata/sdk-ui-filters";
 import React, { useState } from "react";
 import * as Md from "../md/full";
+import { Calculator } from "./Calculator";
 
 const dateFrom = new Date();
 dateFrom.setMonth(dateFrom.getMonth() - 1);
@@ -203,7 +204,7 @@ export const Dashboard = () => {
     );
 
     return (
-        <div id="test" className="py-3" style={{ paddingBottom: "1000000px" }}>
+        <div id="test" className="py-3">
             <h1>My Dashboard - {state.selectedFilterOption.name}</h1>
             <div className="border border-3 border-dark" style={{ height: "100px" }}>
                 <div className="text-end me-3 mt-1 fw-bold">Filter Bar</div>
@@ -219,7 +220,7 @@ export const Dashboard = () => {
                         onApply={onApply}
                     />
                 </div>
-                <div className="border border-start border-bottom border-3 border-dark mt-5">
+                <div className="d-flex justify-content-start border-start border-bottom border-3 border-dark mt-5">
                     <LineChart
                         className="s-line-chart"
                         measures={measures}
@@ -227,6 +228,9 @@ export const Dashboard = () => {
                         segmentBy={segment}
                         filters={dateFilter ? [dateFilter] : []}
                     />
+                    <div className="border border-bottom-0 border-3 border-dark ms-2">
+                        <Calculator />
+                    </div>
                 </div>
             </div>
         </div>
