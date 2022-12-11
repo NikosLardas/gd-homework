@@ -1,17 +1,25 @@
 // @ts-nocheck
-import { DateFilter } from "@gooddata/sdk-ui-filters";
+import { modifyMeasure } from "@gooddata/sdk-model";
+import { LineChart } from "@gooddata/sdk-ui-charts";
+import { DateFilter, DateFilterHelpers } from "@gooddata/sdk-ui-filters";
 import React, { useState } from "react";
+import * as Md from "../md/full";
 
 const dateFrom = new Date();
 dateFrom.setMonth(dateFrom.getMonth() - 1);
 
 const availableGranularities = ["GDC.time.date", "GDC.time.month", "GDC.time.quarter", "GDC.time.year"];
 
+const Revenue = modifyMeasure(Md.Revenue, (m) => m.format("#,##0").alias("$ Revenue"));
+const segment = Md.Product.Default;
+
+const measures = [Revenue];
+
 const defaultDateFilterOptions = {
     allTime: {
         localIdentifier: "ALL_TIME",
         type: "allTime",
-        name: "",
+        name: "All Time",
         visible: true,
     },
 
@@ -20,7 +28,7 @@ const defaultDateFilterOptions = {
         type: "absoluteForm",
         from: dateFrom.toISOString().substr(0, 10), // 'YYYY-MM-DD'
         to: new Date().toISOString().substr(0, 10), // 'YYYY-MM-DD'
-        name: "",
+        name: "Selected dates",
         visible: true,
     },
 
@@ -50,7 +58,7 @@ const defaultDateFilterOptions = {
         granularity: "GDC.time.month",
         from: undefined,
         to: undefined,
-        name: "",
+        name: "Selected Month",
         visible: true,
     },
 
@@ -63,7 +71,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_7_DAYS",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last 7 days",
             },
 
             {
@@ -73,7 +81,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_30_DAYS",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last 30 days",
             },
 
             {
@@ -83,7 +91,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_90_DAYS",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last 90 days",
             },
         ],
 
@@ -95,7 +103,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "THIS_MONTH",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "This month",
             },
 
             {
@@ -105,7 +113,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_MONTH",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last month",
             },
 
             {
@@ -115,7 +123,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_12_MONTHS",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last 12 months",
             },
         ],
 
@@ -127,7 +135,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "THIS_QUARTER",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "This quarter",
             },
 
             {
@@ -137,7 +145,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_QUARTER",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last quarter",
             },
 
             {
@@ -147,7 +155,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_4_QUARTERS",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last 4 quartes",
             },
         ],
 
@@ -159,7 +167,7 @@ const defaultDateFilterOptions = {
                 localIdentifier: "THIS_YEAR",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "This year",
             },
 
             {
@@ -169,15 +177,13 @@ const defaultDateFilterOptions = {
                 localIdentifier: "LAST_YEAR",
                 type: "relativePreset",
                 visible: true,
-                name: "",
+                name: "Last year",
             },
         ],
     },
 };
 
-const style = { width: 150 };
-
-const FilterBar = () => {
+export const Dashboard = () => {
     const [state, setState] = useState({
         selectedFilterOption: defaultDateFilterOptions.allTime,
         excludeCurrentPeriod: false,
@@ -190,23 +196,39 @@ const FilterBar = () => {
         });
     };
 
+    const dateFilter = DateFilterHelpers.mapOptionToAfm(
+        state.selectedFilterOption,
+        Md.DateDatasets.Date.ref,
+        state.excludeCurrentPeriod,
+    );
+
     return (
-        <div className="border border-3 border-dark" style={{ height: "100px" }}>
-            <div className="text-end me-3 mt-1 fw-bold">Filter Bar</div>
-            <div style={style}>
-                <DateFilter
-                    // excludeCurrentPeriod={state.excludeCurrentPeriod}
-                    selectedFilterOption={state.selectedFilterOption}
-                    filterOptions={defaultDateFilterOptions}
-                    // availableGranularities={availableGranularities}
-                    customFilterName="Selected date"
-                    dateFilterMode="active"
-                    dateFormat="MM/dd/yyyy"
-                    onApply={onApply}
-                />
+        <div id="test" className="py-3" style={{ paddingBottom: "1000000px" }}>
+            <h1>My Dashboard - {state.selectedFilterOption.name}</h1>
+            <div className="border border-3 border-dark" style={{ height: "100px" }}>
+                <div className="text-end me-3 mt-1 fw-bold">Filter Bar</div>
+                <div style={{ width: "200px" }}>
+                    <DateFilter
+                        excludeCurrentPeriod={state.excludeCurrentPeriod}
+                        selectedFilterOption={state.selectedFilterOption}
+                        filterOptions={defaultDateFilterOptions}
+                        availableGranularities={availableGranularities}
+                        customFilterName="Selected date range"
+                        dateFilterMode="active"
+                        dateFormat="MM/dd/yyyy"
+                        onApply={onApply}
+                    />
+                </div>
+                <div className="border border-start border-bottom border-3 border-dark mt-5">
+                    <LineChart
+                        className="s-line-chart"
+                        measures={measures}
+                        trendBy={Md.DateDatasets.Date.Month.Short}
+                        segmentBy={segment}
+                        filters={dateFilter ? [dateFilter] : []}
+                    />
+                </div>
             </div>
         </div>
     );
 };
-
-export default FilterBar;
